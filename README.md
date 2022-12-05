@@ -1,2 +1,2 @@
 ### roccobalocco-AoC 2022:
-*burned brain with burned code, look at it carefully*
+*burned brain with burned code, do not look at it carefully*
