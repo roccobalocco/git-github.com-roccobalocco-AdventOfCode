@@ -11,7 +11,10 @@ public class Sette{
         Map<String, Long> nodes = new HashMap<String, Long>();
         String cwd = "";
 
-        Tree(){}
+        Tree(){
+            cwd = "/";
+            nodes.put(cwd, (long) 0);
+        }
 
         public void moveDown(){
             if (cwd.equals("/"))
@@ -41,32 +44,32 @@ public class Sette{
 
         public void updateNode(Long datas){
             nodes.replace(cwd, getValue(cwd) + datas);
-            updateUp(cwd);
+            if(cwd.equals("/"))
+                return;
+            updateUp(cwd, datas);
         }
 
         public void updateNode(String cwd, Long datas){
+            nodes.replace(cwd, getValue(cwd) + datas);
             if (cwd.equals("/"))
                 return;
-            nodes.replace(cwd, getValue(cwd) + datas);
-            updateUp(cwd);
+            updateUp(cwd, datas);
         }
 
 
-        private void updateUp(String absolutePath) {
-            if (absolutePath.equals("/") || absolutePath.length() == 0)
-                return;
-            Long tmp = getValue(absolutePath);
+        private void updateUp(String absolutePath, Long datas) {
+            //if (absolutePath.equals("/") || absolutePath.length() == 0)
+            //    return;
+            //Long tmp = getValue(absolutePath);
             absolutePath = moveDown(absolutePath);
-            updateNode(absolutePath, tmp);
+            updateNode(absolutePath, datas);
         }
 
         private Long getValue(String cwd) {
-            if (cwd.equals("/"))
-                return (long) 0;
             return nodes.get(cwd);
         }
 
-        public long getSum(){
+        public long getSum(){ //sfida uno
             long tot = 0;
             for (String key : nodes.keySet()){
                 if (nodes.get(key) <= 100000 && nodes.get(key) > 0){
@@ -76,28 +79,24 @@ public class Sette{
             return tot;
         }
 
-        public long getLowest(long limit){
+        public long getLowest(long limit){ //sfida due
             long tot = 0;
             for (String key : nodes.keySet()){
-                if (nodes.get(key) <= limit && tot > nodes.get(key)){
+                if (nodes.get(key) >= limit && (tot > nodes.get(key) ||  tot == 0)){
                     tot = nodes.get(key);
                 }
             }
             return tot;
         }
         public long totSum(){
-            long tot = 0;
-            for (String key : nodes.keySet()){
-                tot += nodes.get(key);
-                System.out.println(key + "--" + nodes.get(key));
-            }
-            return tot;
+            return getValue("/");
         }
     }
     private static void initializeTree(Tree tree, Scanner scanner){
         String s;
         Long sizeList = (long) 0;
         ArrayList<String> dirList = new ArrayList<>();
+        
         while(scanner.hasNext()){
             s = scanner.nextLine();
             if (s.substring(2, 4).equals("cd")){
@@ -141,6 +140,15 @@ public class Sette{
                     sizeList += Long.valueOf(tmp[0]);
             }
         }
+        if (dirList.size() > 0){
+            for (String dir : dirList)
+                tree.addNode(dir);
+            dirList = new ArrayList<>();
+        }
+        if (sizeList > 0){
+            tree.updateNode(sizeList);
+            sizeList = (long) 0;
+        }
     }
 
     public static void main(String[] args) throws FileNotFoundException {
@@ -149,8 +157,6 @@ public class Sette{
         Sette sette = new Sette();
         Tree tree = sette.new Tree();
         initializeTree(tree, s);
-        //Modified for level2, still not working. Fix it asap
-        System.out.println(tree.totSum());
-        //System.out.println(tree.getLowest(1320487000623));
+        System.out.println(tree.getLowest(4274331));
     }
 }
